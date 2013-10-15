@@ -88,7 +88,7 @@ function RenderableModel(gl, model) {
         'precision mediump float;\n' +
         'uniform vec3 u_LightColor;\n' +     // Light color
         'uniform vec3 u_LightPosition;\n' +  // Position of the light source
-        //'uniform vec3 u_AmbientLight;\n' +   // Ambient light color
+        'uniform vec3 u_AmbientLight;\n' +   // Ambient light color
         'uniform vec4 u_diffuseReflectance;\n' +
         'varying vec3 v_Normal;\n' +
         'varying vec3 v_Position;\n' +
@@ -102,8 +102,10 @@ function RenderableModel(gl, model) {
         '  float nDotL = max(dot(lightDirection, normal), 0.0);\n' +
         // Calculate the final color from diffuse reflection and ambient reflection
         '  vec3 diffuse = u_LightColor * u_diffuseReflectance.rgb * nDotL;\n' +
-        //'  vec3 ambient = u_AmbientLight * v_Color.rgb;\n' +
-        '  gl_FragColor = vec4(diffuse, 1.0);\n' +
+        //Calculate teh color dur to ambient reflection
+        '  vec3 ambient = u_AmbientLight;\n' +
+        //Add surface colors dur to diffuse and ambient reflection
+        '  gl_FragColor = vec4(diffuse + ambient, 1.0);\n' +
         '}\n';
     var program = createProgram(gl, VSHADER_SOURCE, FSHADER_SOURCE);
     if (!program) {
@@ -122,6 +124,7 @@ function RenderableModel(gl, model) {
     var u_LightColor = gl.getUniformLocation(program, 'u_LightColor');
     var u_LightPosition = gl.getUniformLocation(program, 'u_LightPosition');
     var drLoc = gl.getUniformLocation(program, 'u_diffuseReflectance');
+    var u_AmbientLight = gl.getUniformLocation(program, 'u_AmbientLight');
 
     var drawables = [];
     var modelTransformations = [];
@@ -157,6 +160,8 @@ function RenderableModel(gl, model) {
 
         gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0); //intensity (white)
         gl.uniform3f(u_LightPosition, 0.0, 0.0, 0.0); //at eye point
+        //Set the ambient light
+        gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
         gl.uniformMatrix4fv(pmLoc, false, pMatrix.elements);
         gl.uniformMatrix4fv(vmLoc, false, vMatrix.elements);
         //var vpMatrix = new Matrix4(pMatrix).multiply(vMatrix); // Right multiply
