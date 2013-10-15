@@ -1,4 +1,5 @@
 function RenderableModel(gl, model) {
+	var lightPosition = [0, 0, 0]; // Originally positioned at the eye.
     function Drawable(vArrays, nVertices, indexArray, drawMode, diffuse) {
         // Create a buffer object
         var vertexBuffers = [];
@@ -102,9 +103,9 @@ function RenderableModel(gl, model) {
         '  float nDotL = max(dot(lightDirection, normal), 0.0);\n' +
         // Calculate the final color from diffuse reflection and ambient reflection
         '  vec3 diffuse = u_LightColor * u_diffuseReflectance.rgb * nDotL;\n' +
-        //Calculate teh color dur to ambient reflection
-        '  vec3 ambient = u_AmbientLight;\n' +
-        //Add surface colors dur to diffuse and ambient reflection
+		// Calculate the color due to diffuse and ambient reflection
+		'  vec3 ambient = u_AmbientLight;\n' +
+		// Add surface colors due to diffuse and ambient reflection
         '  gl_FragColor = vec4(diffuse + ambient, 1.0);\n' +
         '}\n';
     var program = createProgram(gl, VSHADER_SOURCE, FSHADER_SOURCE);
@@ -112,7 +113,7 @@ function RenderableModel(gl, model) {
         console.log('Failed to create program');
         return;
     }
-    //else console.log('Shader Program was successfully created.');
+
     var a_Position = gl.getAttribLocation(program, 'a_Position');
     var a_Normal = gl.getAttribLocation(program, 'a_Normal');
     var a_Locations = [a_Position, a_Normal];
@@ -124,8 +125,7 @@ function RenderableModel(gl, model) {
     var u_LightColor = gl.getUniformLocation(program, 'u_LightColor');
     var u_LightPosition = gl.getUniformLocation(program, 'u_LightPosition');
     var drLoc = gl.getUniformLocation(program, 'u_diffuseReflectance');
-    var u_AmbientLight = gl.getUniformLocation(program, 'u_AmbientLight');
-
+	var u_AmbientLight = gl.getUniformLocation(program, 'u_AmbientLight');
     var drawables = [];
     var modelTransformations = [];
     var nDrawables = 0;
@@ -159,9 +159,9 @@ function RenderableModel(gl, model) {
         gl.useProgram(program);
 
         gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0); //intensity (white)
-        gl.uniform3f(u_LightPosition, 0.0, 0.0, 0.0); //at eye point
-        //Set the ambient light
-        gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
+        gl.uniform3f(u_LightPosition, lightPosition[0], lightPosition[1], lightPosition[2]); //at eye point
+		// Set the ambient light
+		gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
         gl.uniformMatrix4fv(pmLoc, false, pMatrix.elements);
         gl.uniformMatrix4fv(vmLoc, false, vMatrix.elements);
         //var vpMatrix = new Matrix4(pMatrix).multiply(vMatrix); // Right multiply

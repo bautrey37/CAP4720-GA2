@@ -2,8 +2,7 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 {
     var center = [(d.min[0] + d.max[0]) / 2, (d.min[1] + d.max[1]) / 2, (d.min[2] + d.max[2]) / 2];
     var diagonal = Math.sqrt(Math.pow((d.max[0] - d.min[0]), 2) + Math.pow((d.max[1] - d.min[1]), 2) + Math.pow((d.max[2] - d.min[2]), 2));
-    //console.log(center+" "+diagonal);
-
+  
     var name = "auto";
     var at = center;
     var eye = [center[0], center[1] + diagonal * 0.5, center[2] + diagonal * 1.5];
@@ -15,7 +14,10 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
         if (e == undefined) e = eye;
         return new Matrix4().setLookAt(e[0], e[1], e[2], at[0], at[1], at[2], up[0], up[1], up[2]);
     };
-
+	
+	this.getEye = function() {
+		return eye;
+	}
     this.getProjMatrix = function (FOV, n, f) {
         fov = FOV;
         near = diagonal * n;
@@ -87,17 +89,79 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 		// Set camera's new view matrix.
 		return this.getViewMatrix();
 	}
+	// User pressed 'a' key. Truck (Step left)
 	this.truckLeft = function() {
-		// User pressed 'a' key. Truck (Step left)
+		var delta = diagonal * 0.05;
+		var m = this.getViewMatrix();
+		// Get the camera's local x-axis (U-axis).
+		var u = [m.elements[0], m.elements[4], m.elements[8]];
+		
+		var newEye = new Matrix4()
+					.setTranslate(-u[0] * delta, -u[1] * delta, -u[2] * delta)
+					.multiplyVector4(new Vector4([eye[0], eye[1], eye[2], 1]));
+					
+		var newAt = new Matrix4()
+					.setTranslate(-u[0] * delta, -u[1] * delta, -u[2] * delta)
+					.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
+					
+		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
+		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+		
+		return this.getViewMatrix();
 	}
+	// User pressed 'd' key. Truck (Step right)
 	this.truckRight = function() {
-		// User pressed 'd' key. Truck (Step right)
+		var delta = diagonal * 0.05;
+		var m = this.getViewMatrix();
+		// Get the camera's local x-axis (U-axis).
+		var u = [m.elements[0], m.elements[4], m.elements[8]];
+		
+		var newEye = new Matrix4()
+					.setTranslate(u[0] * delta, u[1] * delta, u[2] * delta)
+					.multiplyVector4(new Vector4([eye[0], eye[1], eye[2], 1]));
+					
+		var newAt = new Matrix4()
+					.setTranslate(u[0] * delta, u[1] * delta, u[2] * delta)
+					.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
+					
+		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
+		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+		
+		return this.getViewMatrix();
+		
 	}
+	// User pressed 'w' key. Dolly (Step in)
 	this.dollyToward = function() {
-		// User pressed 'w' key. Dolly (Step in)
+		var delta = diagonal * 0.001;
+		var w = [eye[0] - at[0], eye[1] - at[1], eye[2] - at[2]];
+		var newEye = new Matrix4()
+					.setTranslate(-w[0] * delta, -w[1] * delta, -w[2] * delta)
+					.multiplyVector4(new Vector4([eye[0], eye[1], eye[2], 1]));
+		var newAt = new Matrix4()
+					.setTranslate(-w[0] * delta, -w[1] * delta, -w[2] * delta)
+					.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
+					
+		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
+		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+		
+		return this.getViewMatrix();
+		
 	}
+	// User pressed 's' key. Dolly (Step back)
 	this.dollyBack = function() {
-		// User pressed 's' key. Dolly (Step back)
+		var delta = diagonal * 0.001;
+		var w = [eye[0] - at[0], eye[1] - at[1], eye[2] - at[2]];
+		var newEye = new Matrix4()
+					.setTranslate(w[0] * delta, w[1] * delta, w[2] * delta)
+					.multiplyVector4(new Vector4([eye[0], eye[1], eye[2], 1]));
+		var newAt = new Matrix4()
+					.setTranslate(w[0] * delta, w[1] * delta, w[2] * delta)
+					.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
+					
+		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
+		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+		
+		return this.getViewMatrix();
 	}
 
 }
