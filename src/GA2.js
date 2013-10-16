@@ -18,12 +18,31 @@
         var fov = 26; //intial values, will change while program runs
         var near = 0.1;
         var far = 3.0;
+		var mFlag = .001;
 
-        function loadModel(modelfilename) {
-            modelfilename = "../model/" + modelfilename + "/models/model.json";
+        function loadModel(modelfilename1) {
+			
+            modelfilename = "../model/" + modelfilename1 + "/models/model.json";
             model = new RenderableModel(gl, parseJSON(modelfilename));
             camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
             projMatrix = camera.getProjMatrix(fov, near, far);
+			viewMatrix = camera.getViewMatrix();
+			if(modelfilename1 == "House"){
+			 mFlag = .001;
+			 
+			}
+			if(modelfilename1 == "DijonPalais"){
+			 mFlag = .00001;
+			}
+			if(modelfilename1 == "House_of_parliament"){
+			 mFlag = .0000001;
+			}
+			if(modelfilename1 == "Shrine"){
+			 mFlag = .00001;
+			}
+			if(modelfilename1 == "crytek"){
+			 mFlag = .001;
+			}
         }
         function WebGL() {
             // ... global variables ...
@@ -87,13 +106,13 @@
 				if(e.keyCode == 87 && intervalW == null) {
 					intervalW = setInterval(function() {
 							// User pressed 'w' key. Dolly (Step in)
-							viewMatrix = camera.dollyToward();
+							viewMatrix = camera.dollyToward(mFlag);
 					}, 100);
 				}
 				if(e.keyCode == 83 && intervalS == null) {
 					intervalS = setInterval(function() {
 							// User pressed 's' key. Dolly (Step back)
-							viewMatrix = camera.dollyBack();
+							viewMatrix = camera.dollyBack(mFlag);
 					}, 100);
 				}
 			}
