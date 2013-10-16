@@ -131,9 +131,9 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 		return this.getViewMatrix();
 		
 	}
-	// User pressed 'w' key. Dolly (Step in)
-	this.dollyToward = function(mFlag) {
-		var delta = diagonal * mFlag;
+	// User pressed 'r' key. Dolly (Step in)
+	this.dollyToward = function() {
+		var delta = .03;
 		var w = [eye[0] - at[0], eye[1] - at[1], eye[2] - at[2]];
 		var newEye = new Matrix4()
 					.setTranslate(-w[0] * delta, -w[1] * delta, -w[2] * delta)
@@ -148,9 +148,9 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 		return this.getViewMatrix();
 		
 	}
-	// User pressed 's' key. Dolly (Step back)
-	this.dollyBack = function(mFlag) {
-		var delta = diagonal * mFlag;
+	// User pressed 'f' key. Dolly (Step back)
+	this.dollyBack = function() {
+		var delta = .03;
 		var w = [eye[0] - at[0], eye[1] - at[1], eye[2] - at[2]];
 		var newEye = new Matrix4()
 					.setTranslate(w[0] * delta, w[1] * delta, w[2] * delta)
@@ -161,8 +161,45 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 					
 		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
 		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+	
 		
 		return this.getViewMatrix();
-	}
 
+	}
+	
+	// User pressed 'w' key. Pedestal (Move up)
+	this.pedestalUp = function() {
+	console.log('got here');
+		var delta = diagonal * 0.05;
+		
+		var newEye = new Matrix4()
+					.setTranslate(up[0] * delta, up[1] * delta, up[2] * delta)
+					.multiplyVector4(new Vector4([eye[0], eye[1], eye[2], 1]));
+		var newAt = new Matrix4()
+					.setTranslate(up[0] * delta, up[1] * delta, up[2] * delta)
+					.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
+					
+		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
+		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+		
+		return this.getViewMatrix();
+	}
+	
+	// User pressed 's' key. Pedestal (Move down)
+	this.pedestalDown = function() {
+	console.log('got here');
+		var delta = diagonal * 0.05;
+		
+		var newEye = new Matrix4()
+					.setTranslate(-up[0] * delta, -up[1] * delta, -up[2] * delta)
+					.multiplyVector4(new Vector4([eye[0], eye[1], eye[2], 1]));
+		var newAt = new Matrix4()
+					.setTranslate(-up[0] * delta, -up[1] * delta, -up[2] * delta)
+					.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
+					
+		eye[0] = newEye.elements[0]; eye[1] = newEye.elements[1]; eye[2] = newEye.elements[2];
+		at[0] = newAt.elements[0]; at[1] = newAt.elements[1]; at[2] = newAt.elements[2];
+		
+		return this.getViewMatrix();
+	}
 }

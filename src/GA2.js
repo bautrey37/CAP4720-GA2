@@ -18,7 +18,6 @@
         var fov = 26; //intial values, will change while program runs
         var near = 0.1;
         var far = 3.0;
-		var mFlag = .001;
 
         function loadModel(modelfilename1) {
 			
@@ -27,22 +26,9 @@
             camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
             projMatrix = camera.getProjMatrix(fov, near, far);
 			viewMatrix = camera.getViewMatrix();
-			if(modelfilename1 == "House"){
-			 mFlag = .001;
-			 
-			}
-			if(modelfilename1 == "DijonPalais"){
-			 mFlag = .00001;
-			}
-			if(modelfilename1 == "House_of_parliament"){
-			 mFlag = .0000001;
-			}
-			if(modelfilename1 == "Shrine"){
-			 mFlag = .00001;
-			}
-			if(modelfilename1 == "crytek"){
-			 mFlag = .001;
-			}
+		document.getElementById("myCanvas").focus();
+		document.getElementById("modelList").blur();
+
         }
         function WebGL() {
             // ... global variables ...
@@ -59,6 +45,7 @@
             loadModel(modelList.options[modelList.selectedIndex].value);
 			var intervalL = null, intervalR = null, intervalU = null, intervalDo = null;
 			var intervalW = null, intervalA = null, intervalS = null, intervalD = null;
+			var intervalR = null, intervalF = null;
 	
 			// Set up key listeners to move through the world.
 			window.onkeydown = 
@@ -67,25 +54,25 @@
 					intervalL = setInterval(function() {
 							// User pressed left arrow.  Pan (Look left)
 							viewMatrix = camera.panLeft();
-					}, 100);
+					}, 30);
 				}
 				if(e.keyCode == 39 && intervalR == null) {
 					intervalR = setInterval(function() {
 							// User pressed right arrow.  Pan (Look right)
 							viewMatrix = camera.panRight();
-					}, 100);
+					}, 30);
 				}
 				if(e.keyCode == 38 && intervalU == null) {
 					intervalU = setInterval(function() {
 							// User pressed up arrow.  Tilt (Look up)
 							viewMatrix = camera.tiltUp();
-					}, 100);
+					}, 30);
 				}
 				if(e.keyCode == 40 && intervalDo == null) {
 					intervalDo = setInterval(function() {
 							// User pressed down arrow.  Tilt (Look down)
 							viewMatrix = camera.tiltDown();
-					}, 100);
+					}, 30);
 				}
 				if(e.keyCode == 65 && intervalA == null) {
 					intervalA = setInterval(function() {
@@ -93,7 +80,7 @@
 							viewMatrix = camera.truckLeft();
 							// The light source is always at the eye.
 							model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
-					}, 100);
+					}, 30);
 				}
 				if(e.keyCode == 68 && intervalD == null) {
 					intervalD = setInterval(function() {
@@ -101,19 +88,31 @@
 							viewMatrix = camera.truckRight();
 							// The light source is always at the eye.
 							model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
-					}, 100);
+					}, 30);
+				}
+				if(e.keyCode == 82 && intervalR == null) {
+					intervalR = setInterval(function() {
+							// User pressed 'r' key. Dolly (Step in)
+							viewMatrix = camera.dollyToward();
+					}, 30);
+				}
+				if(e.keyCode == 70 && intervalF == null) {
+					intervalF = setInterval(function() {
+							// User pressed 'f' key. Dolly (Step back)
+							viewMatrix = camera.dollyBack();
+					}, 30);
 				}
 				if(e.keyCode == 87 && intervalW == null) {
 					intervalW = setInterval(function() {
-							// User pressed 'w' key. Dolly (Step in)
-							viewMatrix = camera.dollyToward(mFlag);
-					}, 100);
+							// User pressed 'w' key. Pedestal (move down)
+							viewMatrix = camera.pedestalUp();
+					}, 30);
 				}
 				if(e.keyCode == 83 && intervalS == null) {
 					intervalS = setInterval(function() {
-							// User pressed 's' key. Dolly (Step back)
-							viewMatrix = camera.dollyBack(mFlag);
-					}, 100);
+							// User pressed 's' key. Pedestal (move down)
+							viewMatrix = camera.pedestalDown();
+					}, 30);
 				}
 			}
 			// Clear previous keydown interval.
@@ -142,6 +141,14 @@
 					clearInterval(intervalD);
 					intervalD = null;
 				}
+				if(e.keyCode == 82) {
+					clearInterval(intervalR);
+					intervalR = null;
+				}
+				if(e.keyCode == 70) {
+					clearInterval(intervalF);
+					intervalF = null;
+				}
 				if(e.keyCode == 87) {
 					clearInterval(intervalW);
 					intervalW = null;
@@ -150,6 +157,7 @@
 					clearInterval(intervalS);
 					intervalS = null;
 				}
+
 			}
 			
             function draw() {
