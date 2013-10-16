@@ -38,49 +38,57 @@
             var angle = 0;
             var modelList = document.getElementById("modelList");
             loadModel(modelList.options[modelList.selectedIndex].value);
-
+			var interval = null;
+	
 			// Set up key listeners to move through the world.
-			window.onkeyup = 
+			window.onkeydown = 
 			function(e) {
-				if (e.keyCode == 37) {
-					// User pressed left arrow.  Pan (Look left)
-					viewMatrix = camera.panLeft();
+				if (interval == null) {
+					// Create new interval 
+					interval = setInterval(function() {
+						if (e.keyCode == 37) {
+							// User pressed left arrow.  Pan (Look left)
+							viewMatrix = camera.panLeft();
+						}
+						if (e.keyCode == 39) {
+							// User pressed right arrow. Pan (Look right)
+							viewMatrix = camera.panRight();
+						}
+						if (e.keyCode == 38) {
+							// User pressed up arrow. Tilt (Look up)
+							viewMatrix = camera.tiltUp();
+						}	
+						if (e.keyCode == 40) {
+							// User pressed down arrow. Tilt (Look down)
+							viewMatrix = camera.tiltDown();
+						}
+						if (e.keyCode == 65) {
+							// User pressed 'a' key. Truck (Step left)
+							viewMatrix = camera.truckLeft();
+							// The light source is always at the eye.
+							model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
+						}
+						if (e.keyCode == 68) {
+							// User pressed 'd' key. Truck (Step right)
+							viewMatrix = camera.truckRight();
+							// The light source is always at the eye.
+							model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
+						}
+						if (e.keyCode == 87) {
+							// User pressed 'w' key. Dolly (Step in)
+							viewMatrix = camera.dollyToward();
+						}
+						if (e.keyCode == 83) {
+							// User pressed 's' key. Dolly (Step back)
+							viewMatrix = camera.dollyBack();
+						}
+					}, 100);
 				}
-				else if (e.keyCode == 39) {
-					// User pressed right arrow. Pan (Look right)
-					viewMatrix = camera.panRight();
-				}
-				else if (e.keyCode == 38) {
-					// User pressed up arrow. Tilt (Look up)
-					viewMatrix = camera.tiltUp();
-				}	
-				else if (e.keyCode == 40) {
-					// User pressed down arrow. Tilt (Look down)
-					viewMatrix = camera.tiltDown();
-				}
-				else if (e.keyCode == 65) {
-					// User pressed 'a' key. Truck (Step left)
-					viewMatrix = camera.truckLeft();
-					// The light source is always at the eye.
-				model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
-				}
-				else if (e.keyCode == 68) {
-					// User pressed 'd' key. Truck (Step right)
-					viewMatrix = camera.truckRight();
-					// The light source is always at the eye.
-				model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
-				}
-				else if (e.keyCode == 87) {
-					// User pressed 'w' key. Dolly (Step in)
-					viewMatrix = camera.dollyToward();
-				}
-				else if (e.keyCode == 83) {
-					// User pressed 's' key. Dolly (Step back)
-					viewMatrix = camera.dollyBack();
-				}
-				
-				
-				
+			}
+			// Clear previous keydown interval.
+			window.onkeyup = function() {
+				clearInterval(interval);
+				interval = null;
 			}
 			
             function draw() {
