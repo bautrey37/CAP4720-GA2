@@ -17,7 +17,7 @@
         var model, camera, projMatrix, viewMatrix;
         var fov = 26; //intial values, will change while program runs
         var near = 0.1;
-        var far = 3.0;
+        var far = 10;
 
         function loadModel(modelfilename1) {
 			
@@ -54,24 +54,28 @@
 					intervalL = setInterval(function() {
 							// User pressed left arrow.  Pan (Look left)
 							viewMatrix = camera.panLeft();
+							model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
 					}, 30);
 				}
 				if(e.keyCode == 39 && intervalR == null) {
 					intervalR = setInterval(function() {
 							// User pressed right arrow.  Pan (Look right)
 							viewMatrix = camera.panRight();
+							model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
 					}, 30);
 				}
 				if(e.keyCode == 38 && intervalU == null) {
 					intervalU = setInterval(function() {
 							// User pressed up arrow.  Tilt (Look up)
 							viewMatrix = camera.tiltUp();
+							model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
 					}, 30);
 				}
 				if(e.keyCode == 40 && intervalDo == null) {
 					intervalDo = setInterval(function() {
 							// User pressed down arrow.  Tilt (Look down)
 							viewMatrix = camera.tiltDown();
+							model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
 					}, 30);
 				}
 				if(e.keyCode == 65 && intervalA == null) {
@@ -106,12 +110,14 @@
 					intervalW = setInterval(function() {
 							// User pressed 'w' key. Pedestal (move down)
 							viewMatrix = camera.pedestalUp();
+							model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
 					}, 30);
 				}
 				if(e.keyCode == 83 && intervalS == null) {
 					intervalS = setInterval(function() {
 							// User pressed 's' key. Pedestal (move down)
 							viewMatrix = camera.pedestalDown();
+							model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
 					}, 30);
 				}
 			}
