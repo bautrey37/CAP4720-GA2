@@ -87,6 +87,7 @@ function RenderableModel(gl, model) {
     // Fragment shader program
     var FSHADER_SOURCE =
         'precision mediump float;\n' +
+        'uniform int light_type;\n' + // 0 - spot, 1 - omnia
         'uniform vec3 u_LightColor;\n' +     // Light color
         'uniform vec3 u_LightPosition;\n' +  // Position of the light source
         'uniform vec3 u_AmbientLight;\n' +   // Ambient light color
@@ -95,18 +96,24 @@ function RenderableModel(gl, model) {
         'varying vec3 v_Position;\n' +
         //'varying vec4 v_Color;\n' +
         'void main() {\n' +
-        // Normalize the normal because it is interpolated and not 1.0 in length any more
-        '  vec3 normal = normalize(v_Normal);\n' +
-        // Calculate the light direction and make its length 1.
-        '  vec3 lightDirection = normalize(u_LightPosition - v_Position);\n' +
-        // The dot product of the light direction and the orientation of a surface (the normal)
-        '  float nDotL = max(dot(lightDirection, normal), 0.0);\n' +
-        // Calculate the final color from diffuse reflection and ambient reflection
-        '  vec3 diffuse = u_LightColor * u_diffuseReflectance.rgb * nDotL;\n' +
-		// Calculate the color due to diffuse and ambient reflection
-		'  vec3 ambient = u_AmbientLight;\n' +
-		// Add surface colors due to diffuse and ambient reflection
-        '  gl_FragColor = vec4(diffuse + ambient, 1.0);\n' +
+            // Normalize the normal because it is interpolated and not 1.0 in length any more
+            'vec3 normal = normalize(v_Normal);\n' +
+            // Calculate the light direction and make its length 1.
+            'vec3 lightDirection = normalize(u_LightPosition - v_Position);\n' +
+            // The dot product of the light direction and the orientation of a surface (the normal)
+            'float nDotL = max(dot(lightDirection, normal), 0.0);\n' +
+            'vec3 diffuse = u_LightColor * u_diffuseReflectance.rgb * nDotL;\n' +
+            // cos(0.349) ~ 10 degrees
+            'if(light_type == 1 || cos(0.1) < nDotL) {\n' +
+                // Calculate the final color from diffuse reflection and ambient reflection
+                'diffuse = u_LightColor * u_diffuseReflectance.rgb * nDotL;\n' +
+            '} else {\n' +
+                'diffuse = vec3(0.0, 0.0, 0.0);\n' + //spot light is outside of spot angle
+            '}\n' +
+            // Calculate the color due to diffuse and ambient reflection
+            'vec3 ambient = u_AmbientLight;\n' +
+            // Add surface colors due to diffuse and ambient reflection
+            'gl_FragColor = vec4(diffuse + ambient, 1.0);\n' +
         '}\n';
     var program = createProgram(gl, VSHADER_SOURCE, FSHADER_SOURCE);
     if (!program) {
@@ -126,6 +133,8 @@ function RenderableModel(gl, model) {
     var u_LightPosition = gl.getUniformLocation(program, 'u_LightPosition');
     var drLoc = gl.getUniformLocation(program, 'u_diffuseReflectance');
 	var u_AmbientLight = gl.getUniformLocation(program, 'u_AmbientLight');
+    var light_type = gl.getUniformLocation(program, 'light_type');
+
     var drawables = [];
     var modelTransformations = [];
     var nDrawables = 0;
@@ -164,6 +173,8 @@ function RenderableModel(gl, model) {
 		gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
         gl.uniformMatrix4fv(pmLoc, false, pMatrix.elements);
         gl.uniformMatrix4fv(vmLoc, false, vMatrix.elements);
+        gl.uniform1i(light_type, 0);
+
         //var vpMatrix = new Matrix4(pMatrix).multiply(vMatrix); // Right multiply
         for (var i = 0; i < nDrawables; i++) {
             //var mMatrix=modelTransformations[i];
