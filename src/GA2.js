@@ -18,15 +18,10 @@ var model, camera, projMatrix, viewMatrix;
 var fov = 26; //initial values, will change while program runs
 var near = 0.1;
 var far = 10;
-// Set up floor
-//	var floorVertices = new Float32Array(
-////			[-1,0,-1, 1,0,-1, -1,0,1,
-//			 -1,0,1, 1,0,1, 1,0,-1]);
 
 function loadModel(modelfilename1) {
     modelfilename = "../model/" + modelfilename1 + "/models/model.json";
     model = new RenderableModel(gl, parseJSON(modelfilename));
-    //floor = new RenderableFloor(gl, floorModel);
     camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
     projMatrix = camera.getProjMatrix(fov, near, far);
     viewMatrix = camera.getViewMatrix();
@@ -61,28 +56,24 @@ function WebGL() {
                 intervalL = setInterval(function () {
                     // User pressed left arrow.  Pan (Look left)
                     viewMatrix = camera.panLeft();
-                    model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
                 }, 30);
             }
             if (e.keyCode == 39 && intervalR == null) {
                 intervalR = setInterval(function () {
                     // User pressed right arrow.  Pan (Look right)
                     viewMatrix = camera.panRight();
-                    model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
                 }, 30);
             }
             if (e.keyCode == 38 && intervalU == null) {
                 intervalU = setInterval(function () {
                     // User pressed up arrow.  Tilt (Look up)
-                    viewMatrix = camera.tiltUp();
-                    model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
+                    viewMatrix = camera.tiltUp();                   
                 }, 30);
             }
             if (e.keyCode == 40 && intervalDo == null) {
                 intervalDo = setInterval(function () {
                     // User pressed down arrow.  Tilt (Look down)
-                    viewMatrix = camera.tiltDown();
-                    model.atPosition = [camera.getAt()[0], camera.getAt()[1], camera.getAt()[2]];
+                    viewMatrix = camera.tiltDown();                  
                 }, 30);
             }
             if (e.keyCode == 65 && intervalA == null) {
