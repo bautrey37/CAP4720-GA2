@@ -14,19 +14,17 @@
             return JSON.parse(Doc);
         }
         var gl;
-        var model, camera, projMatrix, viewMatrix;
+        var model, floor, camera, projMatrix, viewMatrix;
         var fov = 26; //initial values, will change while program runs
         var near = 0.1;
         var far = 10;
-		// Set up floor
-	//	var floorVertices = new Float32Array(
-	////			[-1,0,-1, 1,0,-1, -1,0,1,
-	//			 -1,0,1, 1,0,1, 1,0,-1]);
+		var floorModel = floorObject;
 
         function loadModel(modelfilename1) {
 			
             modelfilename = "../model/" + modelfilename1 + "/models/model.json";
             model = new RenderableModel(gl, parseJSON(modelfilename));
+			floor = new RenderableFloor(gl, floorModel);
             camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
             projMatrix = camera.getProjMatrix(fov, near, far);
 			viewMatrix = camera.getViewMatrix();
@@ -172,6 +170,7 @@
 			
             function draw() {
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+				floor.draw(projMatrix, new Matrix4());
                 model.draw(projMatrix, viewMatrix);
                 window.requestAnimationFrame(draw);
             }

@@ -113,13 +113,12 @@ function RenderableModel(gl, model) {
             // The dot product of the light direction and the orientation of a surface (the normal)
             'float nDotL = max(dot(lightDirection, normal), 0.0);\n' +
             'vec3 diffuse;\n' +
-            // cos(0.349) ~ 10 degrees
             'if(light_type == 1) {\n' +
                 // Calculate the final color from diffuse reflection and ambient reflection
                 'diffuse = u_LightColor * u_diffuseReflectance.rgb * nDotL;\n' +
             '} else {\n' +
 				'float costheta = dot(spotDirection, -lightDirection);\n' + 
-				'float spotFactor = ((costheta - cos(10.0*3.14/(2.0*180.0)))<0.0)?0.0:1.0; \n' +
+				'float spotFactor = pow(costheta, 1000.0); \n' +
                 'diffuse = u_diffuseReflectance.rgb * u_LightColor * max(nDotL, 0.0) * spotFactor; \n' + //(vec3(u_LightPosition.x, u_LightPosition.y, u_LightPosition.z);\n' + //spot light is outside of spot angle
             '}\n' +
             // Calculate the color due to diffuse and ambient reflection
