@@ -1,4 +1,12 @@
-function RenderableModel(gl, model) {
+var lightValue = 1;
+	function changeLight(value)   {
+		lightValue = value;
+		document.getElementById("myCanvas").focus();
+		document.getElementById("button1").blur();
+		document.getElementById("button2").blur();
+	}	
+
+function RenderableModel(gl, model) {	
 	var lightPosition = [0, 0, 0]; // Originally positioned at the eye.
     function Drawable(vArrays, nVertices, indexArray, drawMode, diffuse) {
         // Create a buffer object
@@ -6,6 +14,7 @@ function RenderableModel(gl, model) {
         var nElements = [];
         var nAttributes = vArrays.length;
         var attributesEnabled = [];
+	  
 
         for (var i = 0; i < nAttributes; i++) {
             if (vArrays[i]) {
@@ -172,8 +181,8 @@ function RenderableModel(gl, model) {
 		// Set the ambient light
 		gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
         gl.uniformMatrix4fv(pmLoc, false, pMatrix.elements);
-        gl.uniformMatrix4fv(vmLoc, false, vMatrix.elements);
-        gl.uniform1i(light_type, 0);
+        gl.uniformMatrix4fv(vmLoc, false, vMatrix.elements);	
+        gl.uniform1i(light_type, lightValue);
 
         //var vpMatrix = new Matrix4(pMatrix).multiply(vMatrix); // Right multiply
         for (var i = 0; i < nDrawables; i++) {
