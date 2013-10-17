@@ -35,7 +35,7 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 			// Get the camera's local y-axis (V-axis).
 			var v = [m.elements[1], m.elements[5], m.elements[9]];
 			// Rotate matrix by one degree.
-			var rotM = new Matrix4().setTranslate(eye[0], eye[1], eye[2]).rotate(1, v[0], v[1], v[2]).translate(-eye[0], -eye[1], -eye[2]);
+			var rotM = new Matrix4().setTranslate(eye[0], eye[1], eye[2]).rotate(1.5, v[0], v[1], v[2]).translate(-eye[0], -eye[1], -eye[2]);
 			// Multiply by old at vector.
 			var newAt = rotM.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
 			at[0]=newAt.elements[0]; at[1]=newAt.elements[1]; at[2] =newAt.elements[2];
@@ -49,7 +49,7 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 		// Get the camera's local y-axis (-axis).
 		var v = [m.elements[1], m.elements[5], m.elements[9]];
 		// Rotate matrix by one degree.
-		var rotM = new Matrix4().setTranslate(eye[0], eye[1], eye[2]).rotate(-1, v[0], v[1], v[2]).translate(-eye[0], -eye[1], -eye[2]);
+		var rotM = new Matrix4().setTranslate(eye[0], eye[1], eye[2]).rotate(-1.5, v[0], v[1], v[2]).translate(-eye[0], -eye[1], -eye[2]);
 		// Multiply by old at vector.
 		var newAt = rotM.multiplyVector4(new Vector4([at[0], at[1], at[2], 1]));
 		at[0]=newAt.elements[0]; at[1]=newAt.elements[1]; at[2] =newAt.elements[2];

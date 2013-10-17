@@ -15,9 +15,13 @@
         }
         var gl;
         var model, camera, projMatrix, viewMatrix;
-        var fov = 26; //intial values, will change while program runs
+        var fov = 26; //initial values, will change while program runs
         var near = 0.1;
         var far = 10;
+		// Set up floor
+	//	var floorVertices = new Float32Array(
+	////			[-1,0,-1, 1,0,-1, -1,0,1,
+	//			 -1,0,1, 1,0,1, 1,0,-1]);
 
         function loadModel(modelfilename1) {
 			
@@ -26,8 +30,8 @@
             camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
             projMatrix = camera.getProjMatrix(fov, near, far);
 			viewMatrix = camera.getViewMatrix();
-		document.getElementById("myCanvas").focus();
-		document.getElementById("modelList").blur();
+			document.getElementById("myCanvas").focus();
+			document.getElementById("modelList").blur();
 
         }
         function WebGL() {
