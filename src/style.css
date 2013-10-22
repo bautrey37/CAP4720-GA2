@@ -1,15 +1,26 @@
 * {
     font-family: sans-serif;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; /*adds border to the inside*/
+}
+
+#toolbar {
+    height: 100%;
+    background-color: red;
+    width: 200px;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+}
+.slider {
+    width: 100%;
 }
 
 body {
-    background: grey;
+    margin: 0;
 }
 
 canvas {
-    border: 1px solid #FF0000;
-}
-
-div {
-    float: left;
+    display: block;
 }

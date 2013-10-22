@@ -15,28 +15,26 @@
     <script src="GA2.js"></script>
 </head>
 <body onload="main()">
-<br>
-
-<div>
-    <canvas id="myCanvas" width="1200px" height="700px">
-        Use a browser that supports Web GL.
-    </canvas>
-</div>
-<div>
-    <input type="range" name="fov" min="1" max="60" step="0.5" value="32" onchange="webgl.changeFOV(value)"/>
+<div id="toolbar">
     <strong> FOV <span id="fovNum">32</span></strong><br/>
-    <input type="range" name="near" min="0.1" max="1.8" step="0.01" value="0.1" onchange="webgl.changeNear(value)"/>
+    <input type="range" name="fov" min="1" max="60" step="0.5" value="32" class="slider"
+           onchange="webgl.changeFOV(value)"/><br/>
     <strong> Near Plane <span id="nearNum">0.1</span></strong><br/>
-    <input type="range" name="far" min="1.0" max="10" step="0.01" value="10.0" onchange="webgl.changeFar(value)"/>
+    <input type="range" name="near" min="0.1" max="1.8" step="0.01" value="0.1" class="slider"
+           onchange="webgl.changeNear(value)"/><br/>
     <strong> Far Plane <span id="farNum">10.0</span></strong><br/>
-	<input type="range" name="lightIntensity" min="100" max="1000" step="10" value="1000" onchange="changeN(value)">
+    <input type="range" name="far" min="1.0" max="10" step="0.01" value="10.0" class="slider"
+           onchange="webgl.changeFar(value)"/><br/>
     <strong> Spot Light Intensity</strong><br/>
+	<input type="range" name="lightIntensity" min="100" max="1000" step="10" value="1000" class="slider"
+           onchange="changeN(value)"><br/>
 
-    <input type="radio" name="group1" value="0" onclick="changeLight(value);" id="button1"/>
     <strong> Spot Light</strong><br/>
-    <input type="radio" name="group1" value="1" onclick="changeLight(value);" checked="checked" id="button2"/>
+    <input type="radio" name="group1" value="0" id="button1"
+           onclick="changeLight(value);" /><br/>
     <strong> Omni Light</strong><br/>
-	
+    <input type="radio" name="group1" value="1" checked="checked" id="button2"
+           onclick="changeLight(value);" /><br/>
 	
     <select id="modelList" onchange="loadModel(this.value);">
         <option value='House'>House</option>
@@ -46,5 +44,8 @@
         <option value='crytek'>Crytek</option>
     </select><br>
 </div>
+<canvas id="myCanvas">
+    Use a browser that supports Web GL.
+</canvas>
 </body>
 </html>

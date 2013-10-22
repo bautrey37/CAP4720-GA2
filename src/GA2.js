@@ -35,6 +35,9 @@ function WebGL() {
 
     canvas = document.getElementById("myCanvas");
     addMessage(((canvas) ? "Canvas acquired" : "Error: Can not acquire canvas"));
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
     gl = getWebGLContext(canvas, false);
     addMessage(((gl) ? "Rendering context for WebGL acquired" : "Error: Failed to get the rendering context for WebGL"));
 

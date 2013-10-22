@@ -152,7 +152,7 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 
     // User pressed 'r' key. Dolly (Step in)
     this.dollyToward = function () {
-        var delta = .03;
+        var delta = .02;
         var w = [eye[0] - at[0], eye[1] - at[1], eye[2] - at[2]];
         var newEye = new Matrix4()
             .setTranslate(-w[0] * delta, -w[1] * delta, -w[2] * delta)
@@ -173,7 +173,7 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
 
     // User pressed 'f' key. Dolly (Step back)
     this.dollyBack = function () {
-        var delta = .03;
+        var delta = .02;
         var w = [eye[0] - at[0], eye[1] - at[1], eye[2] - at[2]];
         var newEye = new Matrix4()
             .setTranslate(w[0] * delta, w[1] * delta, w[2] * delta)
