@@ -1,30 +1,23 @@
 /**
- * Stores texture code
+ * Texture code
  */
+
 function loadModelTexture(modelData, pathname) {
-    var imageDictionary = {};
+    var imageDictionary = {}; //stores texture objects
     for (var i = 0; i < modelData.materials.length; i++) {
         if (modelData.materials[i].diffuseTexture) {
             var filename = modelData.materials[i].diffuseTexture[0];
             console.log(filename);
-            if (imageDictionary[filename] === undefined) {
-                imageDictionary[filename] = setTexture(gl, pathname + filename);
+            if(filename != undefined) {
+                if (imageDictionary[filename] === undefined) {
+                    imageDictionary[filename] = setTexture(gl, pathname + filename);
+                }
             }
+
+            // add tex object to data variable
             modelData.materials[i].diffuseTexObj = imageDictionary[filename];
         }
     }
-}
-
-function createTexture(imageFileName) {
-    var tex = gl.createTexture();
-    var img = new Image();
-    img.onload = function () {
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); //converts texture origin to be from top left to bottom left
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-    };
-    img.src = imageFileName;
 }
 
 var imagecount = 0;

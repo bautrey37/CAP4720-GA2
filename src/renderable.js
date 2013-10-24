@@ -1,12 +1,9 @@
-/**
- *
- * @type {number}
- */
+
 
 var lightValue = 1;
 var nvalue = 100.0;
 
-function changeLight(value)   {
+function changeLight(value) {
 	lightValue = value;
 	document.getElementById("myCanvas").focus();
 	document.getElementById("button1").blur();
@@ -18,7 +15,7 @@ function changeN(value) {
 }
 
 function RenderableModel(gl, model) {
-    function Drawable(vArrays, nVertices, indexArray, drawMode, diffuse, ambient) {
+    function Drawable(vArrays, nVertices, indexArray, drawMode, diffuse, ambient, texOb) {
         // Create a buffer object
         var vertexBuffers = [];
         var nElements = [];
@@ -32,6 +29,7 @@ function RenderableModel(gl, model) {
                     console.log('Failed to create the buffer object');
                     return;
                 }
+
                 // Bind the buffer object to an ARRAY_BUFFER target
                 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffers[i]);
                 // Write date into the buffer object
@@ -56,11 +54,16 @@ function RenderableModel(gl, model) {
             gl.uniform4f(drLoc, diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
             gl.uniform3f(amLoc, ambient[0], ambient[1], ambient[2]);
 
+            //Texture0 - texture unit number, specifies which hardware component to use for textures, i think
+            gl.activeTexture(gl.TEXTURE0); //switches textures
+            gl.bindTexture(gl.TEXTURE_2D, texOb); //binds to vertices
+            gl.uniform1i(samplerLoc, 0); //sets fragment shader sampler to 0
+
             for (var i = 0; i < nAttributes; i++) {
                 if (vertexBuffers[i]) {
                     if (!attributesEnabled[i]) {
                         gl.enableVertexAttribArray(attribLocations[i]);
-                        attributesEnabled[i]=true;
+                        attributesEnabled[i] = true;
                     }
                     // Bind the buffer object to target
                     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffers[i]);
@@ -88,20 +91,20 @@ function RenderableModel(gl, model) {
     var VSHADER_SOURCE =
         'attribute vec4 a_Position;\n' +
         'attribute vec4 a_Normal;\n' +
-        'attribute vec2 a_tCoord;\n' +
+        'attribute vec2 a_texCoord;\n' +
         'uniform mat4 modelT, viewT, projT;\n' +
         'uniform mat4 u_ModelMatrix;\n' +    // Model matrix
         'uniform mat4 u_NormalMatrix;\n' +   // Transformation matrix of the normal
         'varying vec4 v_Color;\n' +
         'varying vec3 v_Normal;\n' +
         'varying vec3 v_Position;\n' +
-        'varying vec2 v_tCoord;\n' +
+        'varying vec2 v_texCoord;\n' +
         'void main() {\n' +
             'gl_Position = projT * viewT * modelT * a_Position;\n' +
             // Calculate the vertex position in the world coordinate
             'v_Position = vec3(viewT * modelT * a_Position);\n' +
             'v_Normal = normalize(vec3(viewT * u_NormalMatrix * vec4(a_Normal.xyz, 0)));\n' +
-            //'v_tCoord = a_tCoord;\n' + //pass data to fragment shader
+            'v_texCoord = a_texCoord;\n' + //pass data to fragment shader
         '}\n';
 
     // Fragment shader program
@@ -117,7 +120,7 @@ function RenderableModel(gl, model) {
         'uniform sampler2D sampler;\n' +
         'varying vec3 v_Normal;\n' +
         'varying vec3 v_Position;\n' +
-        'varying vec2 v_tCoord;\n' +
+        'varying vec2 v_texCoord;\n' +
         'void main() {\n' +
             // Normalize the normal because it is interpolated and not 1.0 in length any more
             'vec3 normal = normalize(v_Normal);\n' +
@@ -138,9 +141,9 @@ function RenderableModel(gl, model) {
             // Calculate the color due to diffuse and ambient reflection
             //'vec3 ambient = u_AmbientLight * u_ambientReflectance;\n' + //if ref is 0, then no ambient
             'vec3 ambient = u_AmbientLight;\n' + //constant ambient on all sides
-            //'vec3 texColor = texture2D(sampler, v_tCoord).rgb;\n' +
+            'vec3 texColor = texture2D(sampler, v_texCoord).rgb;\n' +
             // Add surface colors due to diffuse and ambient reflection
-            'gl_FragColor = vec4(diffuse + ambient, 1.0);\n' +
+            'gl_FragColor = vec4(texColor*diffuse + ambient, 1.0);\n' +
         '}\n';
     var program = createProgram(gl, VSHADER_SOURCE, FSHADER_SOURCE);
     if (!program) {
@@ -151,8 +154,8 @@ function RenderableModel(gl, model) {
     var lightPosition = [0, 0, 0]; // Originally positioned at the eye.
     var a_Position = gl.getAttribLocation(program, 'a_Position');
     var a_Normal = gl.getAttribLocation(program, 'a_Normal');
-    var a_Locations = [a_Position, a_Normal];
-    var a_tCoord = gl.getAttribLocation(program, 'a_tCoord');
+    var a_texCoord = gl.getAttribLocation(program, 'a_texCoord');
+    var a_Locations = [a_Position, a_Normal, a_texCoord];
     // Get the location/address of the uniform variable inside the shader program.
     var mmLoc = gl.getUniformLocation(program, "modelT");
     var vmLoc = gl.getUniformLocation(program, "viewT");
@@ -165,6 +168,7 @@ function RenderableModel(gl, model) {
     var amLoc = gl.getUniformLocation(program, 'u_ambientReflectance');
 	var u_AmbientLight = gl.getUniformLocation(program, 'u_AmbientLight');
     var light_type = gl.getUniformLocation(program, 'light_type');
+    var samplerLoc = gl.getUniformLocation(program, 'sampler');
 
     var drawables = [];
     var modelTransformations = [];
@@ -179,9 +183,10 @@ function RenderableModel(gl, model) {
             var mesh = model.meshes[index];
             var materials = model.materials[mesh.materialIndex];
             drawables[nDrawables] = new Drawable(
-                [mesh.vertexPositions, mesh.vertexNormals],
+                [mesh.vertexPositions, mesh.vertexNormals, (mesh.vertexTexCoordinates)?mesh.vertexTexCoordinates[0]:undefined],
                 mesh.vertexPositions.length / 3,
-                mesh.indices, drawMode, materials.diffuseReflectance, materials.ambientReflectance
+                mesh.indices, drawMode, materials.diffuseReflectance, materials.ambientReflectance,
+                materials.diffuseTexObj
             );
 
             var m = new Matrix4();
@@ -191,7 +196,7 @@ function RenderableModel(gl, model) {
 
             nDrawables++;
         }
-    } //End of Rederable object call
+    } //End of Renderable object call
 
     // Get the location/address of the vertex attribute inside the shader program.
     this.draw = function (pMatrix, vMatrix, mMatrix) {

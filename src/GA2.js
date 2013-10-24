@@ -44,7 +44,7 @@ function WebGL() {
 
     canvas = document.getElementById("myCanvas");
     addMessage(((canvas) ? "Canvas acquired" : "Error: Can not acquire canvas"));
-    canvas.width = window.innerWidth;
+    canvas.width = window.innerWidth - 249; //subtracts the toolbar width
     canvas.height = window.innerHeight;
 
     gl = getWebGLContext(canvas, false);

@@ -1,5 +1,5 @@
 {
-	"name" : "noname",
+	"name" : "House",
 	"materials" : [
 		{
 			"diffuseTexture":["../images/texture0.jpg"],
