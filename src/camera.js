@@ -3,7 +3,6 @@ function Camera(gl, d, modelUp) // Compute a camera from model's bounding box di
     var center = [(d.min[0] + d.max[0]) / 2, (d.min[1] + d.max[1]) / 2, (d.min[2] + d.max[2]) / 2];
     var diagonal = Math.sqrt(Math.pow((d.max[0] - d.min[0]), 2) + Math.pow((d.max[1] - d.min[1]), 2) + Math.pow((d.max[2] - d.min[2]), 2));
 
-    var name = "auto";
     var at = center;
     var eye = [center[0], center[1] + diagonal * 0.5, center[2] + diagonal * 1.5];
     var up = [modelUp[0], modelUp[1], modelUp[2]];

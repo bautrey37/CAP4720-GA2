@@ -12,9 +12,8 @@ function changeN(value) {
 	nvalue = 1100.0 - value;
 }
 
-function RenderableModel(gl, model) {	
-	var lightPosition = [0, 0, 0]; // Originally positioned at the eye.
-    function Drawable(vArrays, nVertices, indexArray, drawMode, diffuse) {
+function RenderableModel(gl, model) {
+    function Drawable(vArrays, nVertices, indexArray, drawMode, diffuse, ambient) {
         // Create a buffer object
         var vertexBuffers = [];
         var nElements = [];
@@ -50,6 +49,7 @@ function RenderableModel(gl, model) {
         this.draw = function (attribLocations) {
             //gets diffuse reflectance from json and sets it in the fragment shader
             gl.uniform4f(drLoc, diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
+            gl.uniform4f(amLoc, ambient[0], ambient[1], ambient[2], ambient[3]);
 
             for (var i = 0; i < nAttributes; i++) {
                 if (vertexBuffers[i]) {
@@ -104,6 +104,7 @@ function RenderableModel(gl, model) {
         'uniform vec3 u_LightPosition;\n' +  // Position of the light source
         'uniform vec3 u_AmbientLight;\n' +   // Ambient light color
         'uniform vec4 u_diffuseReflectance;\n' +
+        'uniform vec4 u_ambientReflectance;\n' +
 		'uniform float u_N;\n' +
         'varying vec3 v_Normal;\n' +
         'varying vec3 v_Position;\n' +
@@ -135,6 +136,7 @@ function RenderableModel(gl, model) {
         return;
     }
 
+    var lightPosition = [0, 0, 0]; // Originally positioned at the eye.
     var a_Position = gl.getAttribLocation(program, 'a_Position');
     var a_Normal = gl.getAttribLocation(program, 'a_Normal');
     var a_Locations = [a_Position, a_Normal];
@@ -147,6 +149,7 @@ function RenderableModel(gl, model) {
     var u_LightPosition = gl.getUniformLocation(program, 'u_LightPosition');
 	var u_N = gl.getUniformLocation(program, 'u_N');
     var drLoc = gl.getUniformLocation(program, 'u_diffuseReflectance');
+    var amLoc = gl.getUniformLocation(program, 'u_ambientReflectance');
 	var u_AmbientLight = gl.getUniformLocation(program, 'u_AmbientLight');
     var light_type = gl.getUniformLocation(program, 'light_type');
 
@@ -165,7 +168,7 @@ function RenderableModel(gl, model) {
             drawables[nDrawables] = new Drawable(
                 [mesh.vertexPositions, mesh.vertexNormals],
                 mesh.vertexPositions.length / 3,
-                mesh.indices, drawMode, materials.diffuseReflectance
+                mesh.indices, drawMode, materials.diffuseReflectance, materials.ambientReflectance
             );
 
             var m = new Matrix4();
@@ -175,15 +178,15 @@ function RenderableModel(gl, model) {
 
             nDrawables++;
         }
-    }
+    } //End of Rederable object call
+
     // Get the location/address of the vertex attribute inside the shader program.
     this.draw = function (pMatrix, vMatrix, mMatrix) {
         gl.useProgram(program);
 		gl.uniform1f(u_N, nvalue);
         gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0); //intensity (white)
         gl.uniform3f(u_LightPosition, lightPosition[0], lightPosition[1], lightPosition[2]); //at eye point
-		// Set the ambient light
-		gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);
+		gl.uniform3f(u_AmbientLight, 0.1, 0.1, 0.1);// Set the ambient light
         gl.uniformMatrix4fv(pmLoc, false, pMatrix.elements);
         gl.uniformMatrix4fv(vmLoc, false, vMatrix.elements);	
         gl.uniform1i(light_type, lightValue);
@@ -203,6 +206,7 @@ function RenderableModel(gl, model) {
         }
         gl.useProgram(null);
     };
+
     this.getBounds = function () // Computes Model bounding box
     {
         var xmin, xmax, ymin, ymax, zmin, zmax;

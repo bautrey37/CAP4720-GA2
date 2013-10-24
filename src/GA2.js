@@ -1,4 +1,13 @@
 var webgl;
+var gl;
+var model, camera, projMatrix, viewMatrix;
+var fov = 26; //initial values, will change while program runs
+var near = 0.1;
+var far = 10;
+
+function main() {
+    webgl = new WebGL();
+}
 
 function addMessage(message) {
     console.log(message);
@@ -13,25 +22,18 @@ function parseJSON(jsonFile) {
     var Doc = xhttp.responseText;
     return JSON.parse(Doc);
 }
-var gl;
-var model, camera, projMatrix, viewMatrix;
-var fov = 26; //initial values, will change while program runs
-var near = 0.1;
-var far = 10;
 
-function loadModel(modelfilename1) {
-    modelfilename = "../model/" + modelfilename1 + "/models/model.json";
-    model = new RenderableModel(gl, parseJSON(modelfilename));
+function loadModel(modelfilename) {
+    model = new RenderableModel(gl, parseJSON("../model/" + modelfilename + "/models/model.json"));
     camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
     projMatrix = camera.getProjMatrix(fov, near, far);
     viewMatrix = camera.getViewMatrix();
     document.getElementById("myCanvas").focus();
     document.getElementById("modelList").blur();
 }
+
 function WebGL() {
-    // ... global variables ...
-    var canvas = null;
-    var messageField = null;
+    var canvas;
 
     canvas = document.getElementById("myCanvas");
     addMessage(((canvas) ? "Canvas acquired" : "Error: Can not acquire canvas"));
@@ -46,7 +48,7 @@ function WebGL() {
     loadModel(modelList.options[modelList.selectedIndex].value);
     var intervalL = null, intervalR = null, intervalU = null, intervalDo = null;
     var intervalW = null, intervalA = null, intervalS = null, intervalD = null;
-    var intervalR = null, intervalF = null;
+    var intervalF = null;
 
     var fovNum = document.getElementById('fovNum');
     var nearNum = document.getElementById('nearNum');
@@ -109,7 +111,7 @@ function WebGL() {
             }
             if (e.keyCode == 87 && intervalW == null) {
                 intervalW = setInterval(function () {
-                    // User pressed 'w' key. Pedestal (move down)
+                    // User pressed 'w' key. Pedestal (move up)
                     viewMatrix = camera.pedestalUp();
                     model.lightPosition = [camera.getEye()[0], camera.getEye()[1], camera.getEye()[2]];
                 }, 30);
@@ -128,7 +130,7 @@ function WebGL() {
                 model.draw(projMatrix, viewMatrix);
                 window.requestAnimationFrame(draw);
             }
-        }
+        };
     // Clear previous keydown interval.
     window.onkeyup = function (e) {
         if (e.keyCode == 37) {
@@ -172,7 +174,7 @@ function WebGL() {
             intervalS = null;
         }
 
-    }
+    };
 
     function draw() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -202,8 +204,4 @@ function WebGL() {
         farNum.innerHTML = val;
         projMatrix = camera.getProjMatrix(fov, near, val);
     };
-}
-
-function main() {
-    webgl = new WebGL();
 }
