@@ -1,3 +1,7 @@
+/**
+ *
+ */
+
 var webgl;
 var gl;
 var model, camera, projMatrix, viewMatrix;
@@ -24,7 +28,10 @@ function parseJSON(jsonFile) {
 }
 
 function loadModel(modelfilename) {
-    model = new RenderableModel(gl, parseJSON("../model/" + modelfilename + "/models/model.json"));
+    var pathname = '../model/' + modelfilename + '/models/';
+    var modelData = parseJSON(pathname + 'model.json');
+    loadModelTexture(modelData, pathname);
+    model = new RenderableModel(gl, modelData);
     camera = new Camera(gl, model.getBounds(), [0, 1, 0]);
     projMatrix = camera.getProjMatrix(fov, near, far);
     viewMatrix = camera.getViewMatrix();
@@ -72,13 +79,13 @@ function WebGL() {
             if (e.keyCode == 38 && intervalU == null) {
                 intervalU = setInterval(function () {
                     // User pressed up arrow.  Tilt (Look up)
-                    viewMatrix = camera.tiltUp();                   
+                    viewMatrix = camera.tiltUp();
                 }, 30);
             }
             if (e.keyCode == 40 && intervalDo == null) {
                 intervalDo = setInterval(function () {
                     // User pressed down arrow.  Tilt (Look down)
-                    viewMatrix = camera.tiltDown();                  
+                    viewMatrix = camera.tiltDown();
                 }, 30);
             }
             if (e.keyCode == 65 && intervalA == null) {

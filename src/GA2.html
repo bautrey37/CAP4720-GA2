@@ -10,6 +10,7 @@
     <script src="../lib/cuon-matrix.js"></script>
     <script src="renderable.js"></script>
     <script src="camera.js"></script>
+    <script src="texture.js"></script>
     <script src="GA2.js"></script>
 </head>
 <body onload="main()">
@@ -33,7 +34,8 @@
     <strong> Omni Light</strong><br/>
     <input type="radio" name="group1" value="1" checked="checked" id="button2"
            onclick="changeLight(value);" /><br/>
-	
+
+    <strong>Models</strong><br>
     <select id="modelList" onchange="loadModel(this.value);">
         <option value='House'>House</option>
         <option value='DijonPalais'>DijonPalais</option>

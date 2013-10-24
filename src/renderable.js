@@ -1,3 +1,8 @@
+/**
+ *
+ * @type {number}
+ */
+
 var lightValue = 1;
 var nvalue = 100.0;
 
@@ -49,7 +54,7 @@ function RenderableModel(gl, model) {
         this.draw = function (attribLocations) {
             //gets diffuse reflectance from json and sets it in the fragment shader
             gl.uniform4f(drLoc, diffuse[0], diffuse[1], diffuse[2], diffuse[3]);
-            gl.uniform4f(amLoc, ambient[0], ambient[1], ambient[2], ambient[3]);
+            gl.uniform3f(amLoc, ambient[0], ambient[1], ambient[2]);
 
             for (var i = 0; i < nAttributes; i++) {
                 if (vertexBuffers[i]) {
@@ -83,17 +88,20 @@ function RenderableModel(gl, model) {
     var VSHADER_SOURCE =
         'attribute vec4 a_Position;\n' +
         'attribute vec4 a_Normal;\n' +
+        'attribute vec2 a_tCoord;\n' +
         'uniform mat4 modelT, viewT, projT;\n' +
         'uniform mat4 u_ModelMatrix;\n' +    // Model matrix
         'uniform mat4 u_NormalMatrix;\n' +   // Transformation matrix of the normal
         'varying vec4 v_Color;\n' +
         'varying vec3 v_Normal;\n' +
         'varying vec3 v_Position;\n' +
+        'varying vec2 v_tCoord;\n' +
         'void main() {\n' +
-        '  gl_Position = projT * viewT * modelT * a_Position;\n' +
-        // Calculate the vertex position in the world coordinate
-        '  v_Position = vec3(viewT * modelT * a_Position);\n' +
-        '  v_Normal = normalize(vec3(viewT * u_NormalMatrix * vec4(a_Normal.xyz, 0)));\n' +
+            'gl_Position = projT * viewT * modelT * a_Position;\n' +
+            // Calculate the vertex position in the world coordinate
+            'v_Position = vec3(viewT * modelT * a_Position);\n' +
+            'v_Normal = normalize(vec3(viewT * u_NormalMatrix * vec4(a_Normal.xyz, 0)));\n' +
+            //'v_tCoord = a_tCoord;\n' + //pass data to fragment shader
         '}\n';
 
     // Fragment shader program
@@ -104,10 +112,12 @@ function RenderableModel(gl, model) {
         'uniform vec3 u_LightPosition;\n' +  // Position of the light source
         'uniform vec3 u_AmbientLight;\n' +   // Ambient light color
         'uniform vec4 u_diffuseReflectance;\n' +
-        'uniform vec4 u_ambientReflectance;\n' +
+        'uniform vec3 u_ambientReflectance;\n' +
 		'uniform float u_N;\n' +
+        'uniform sampler2D sampler;\n' +
         'varying vec3 v_Normal;\n' +
         'varying vec3 v_Position;\n' +
+        'varying vec2 v_tCoord;\n' +
         'void main() {\n' +
             // Normalize the normal because it is interpolated and not 1.0 in length any more
             'vec3 normal = normalize(v_Normal);\n' +
@@ -126,7 +136,9 @@ function RenderableModel(gl, model) {
                 'diffuse = u_diffuseReflectance.rgb * u_LightColor * max(nDotL, 0.0) * spotFactor; \n' +
             '}\n' +
             // Calculate the color due to diffuse and ambient reflection
-            'vec3 ambient = u_AmbientLight;\n' +
+            //'vec3 ambient = u_AmbientLight * u_ambientReflectance;\n' + //if ref is 0, then no ambient
+            'vec3 ambient = u_AmbientLight;\n' + //constant ambient on all sides
+            //'vec3 texColor = texture2D(sampler, v_tCoord).rgb;\n' +
             // Add surface colors due to diffuse and ambient reflection
             'gl_FragColor = vec4(diffuse + ambient, 1.0);\n' +
         '}\n';
@@ -140,6 +152,7 @@ function RenderableModel(gl, model) {
     var a_Position = gl.getAttribLocation(program, 'a_Position');
     var a_Normal = gl.getAttribLocation(program, 'a_Normal');
     var a_Locations = [a_Position, a_Normal];
+    var a_tCoord = gl.getAttribLocation(program, 'a_tCoord');
     // Get the location/address of the uniform variable inside the shader program.
     var mmLoc = gl.getUniformLocation(program, "modelT");
     var vmLoc = gl.getUniformLocation(program, "viewT");
