@@ -16,16 +16,16 @@
 <body onload="main()">
 <div id="toolbar">
     <strong> FOV <span id="fovNum">32</span></strong><br/>
-    <input type="range" name="fov" min="1" max="60" step="0.5" value="32" class="slider"
+    <input type="range" name="fov" id="fov" min="1" max="60" step="0.5" value="32" class="slider"
            onchange="webgl.changeFOV(value)"/><br/>
     <strong> Near Plane <span id="nearNum">0.1</span></strong><br/>
-    <input type="range" name="near" min="0.1" max="1.8" step="0.01" value="0.1" class="slider"
+    <input type="range" name="near" id="near" min="0.1" max="1.8" step="0.01" value="0.1" class="slider"
            onchange="webgl.changeNear(value)"/><br/>
-    <strong> Far Plane <span id="farNum">10.0</span></strong><br/>
-    <input type="range" name="far" min="1.0" max="10" step="0.01" value="10.0" class="slider"
+    <strong> Far Plane <span id="farNum">3.0</span></strong><br/>
+    <input type="range" name="far" id="far" min="1.0" max="5" step="0.01" value="3.0" class="slider"
            onchange="webgl.changeFar(value)"/><br/>
     <strong> Spot Light Intensity</strong><br/>
-	<input type="range" name="lightIntensity" min="100" max="1000" step="10" value="1000" class="slider"
+	<input type="range" name="lightIntensity" id="LI" min="100" max="1000" step="10" value="1000" class="slider"
            onchange="changeN(value)"><br/>
 
     <strong> Spot Light</strong><br/>

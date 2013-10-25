@@ -1,6 +1,3 @@
-/**
- *
- */
 
 var webgl;
 var gl;
@@ -199,16 +196,22 @@ function WebGL() {
     this.changeFOV = function (val) {
         fov = val;
         fovNum.innerHTML = val;
+        document.getElementById("myCanvas").focus();
+        document.getElementById("fov").blur();
         projMatrix = camera.getProjMatrix(val, near, far);
     };
     this.changeNear = function (val) {
         near = val;
         nearNum.innerHTML = val;
+        document.getElementById("myCanvas").focus();
+        document.getElementById("near").blur();
         projMatrix = camera.getProjMatrix(fov, val, far);
     };
     this.changeFar = function (val) {
         far = val;
         farNum.innerHTML = val;
+        document.getElementById("myCanvas").focus();
+        document.getElementById("far").blur();
         projMatrix = camera.getProjMatrix(fov, near, val);
     };
 }

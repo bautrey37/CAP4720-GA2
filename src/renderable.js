@@ -1,5 +1,4 @@
 
-
 var lightValue = 1;
 var nvalue = 100.0;
 
@@ -12,6 +11,8 @@ function changeLight(value) {
 
 function changeN(value) {
 	nvalue = 1100.0 - value;
+    document.getElementById("myCanvas").focus();
+    document.getElementById("LI").blur();
 }
 
 function RenderableModel(gl, model) {
